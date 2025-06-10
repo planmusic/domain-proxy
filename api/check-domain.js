@@ -20,18 +20,24 @@ module.exports = async function handler(req, res) {
     const response = await fetch('https://api.name.com/v4/domains:checkAvailability', {
       method: 'POST',
       headers: {
-        'Authorization': 'Token token=fb23c9d9d9d2291ae95e9185f4e1638a907e51f4',
+        'Authorization': 'Token token=367bbe8320fc2dfbe8b641427c3dcfc0cf4a69dc',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ domainNames: [planmusic.co] })
+      body: JSON.stringify({ domainNames: [domain] })
     });
 
     const data = await response.json();
 
     console.log('API Response:', data);
 
+    if (!response.ok) {
+      return res.status(response.status).json({ error: 'API hatası', details: data });
+    }
+
     return res.status(200).json(data);
+
   } catch (err) {
+    console.error('API çağrısı başarısız:', err);
     return res.status(500).json({ error: 'API çağrısı başarısız.', details: err.message });
   }
-}
+};
