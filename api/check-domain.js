@@ -1,7 +1,9 @@
+const fetch = require('node-fetch'); // Node 18 öncesi için gerekli
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -12,8 +14,8 @@ module.exports = async function handler(req, res) {
   }
 
   const { domain } = req.body;
-  if (!domain) {
-    return res.status(400).json({ error: 'Lütfen domain gönderin.' });
+  if (!domain || !domain.includes('.')) {
+    return res.status(400).json({ error: 'Lütfen geçerli bir domain gönderin. Örnek: example.com' });
   }
 
   try {
@@ -28,19 +30,14 @@ module.exports = async function handler(req, res) {
 
     const data = await response.json();
 
-    console.log('API Response:', data);
-
-    {
-  "results": [
-    {
-      "domainName": "example.com",
-      "available": true
-    }
-  ]
-}
+    console.log('API Response:', data); // Sunucu loguna bak
 
     if (!response.ok) {
       return res.status(response.status).json({ error: 'API hatası', details: data });
+    }
+
+    if (!data || !data.results || !Array.isArray(data.results)) {
+      return res.status(500).json({ error: 'Beklenmeyen yanıt. API döndürülen veri eksik.', raw: data });
     }
 
     return res.status(200).json(data);
