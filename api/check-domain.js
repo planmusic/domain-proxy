@@ -20,6 +20,12 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Domain is required' });
   }
 
+  // Basic domain format validation
+  const domainRegex = /^(?!:\/\/)([a-zA-Z0-9-]+\.){1,}[a-zA-Z]{2,}$/;
+  if (!domainRegex.test(domain)) {
+    return res.status(400).json({ error: 'Invalid domain format. Example: example.com' });
+  }
+
   // Get API credentials from environment variables
   const API_USERNAME = process.env.NAME_API_USERNAME;
   const API_TOKEN = process.env.NAME_API_TOKEN;
@@ -32,11 +38,11 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  // Rest of your code...
   try {
-   const response = await fetch(`https://api.whoapi.com/?domain=${domain}&r=whois&apikey=${process.env.WHOAPI_KEY}`);
+    const authString = Buffer.from(`${API_USERNAME}:${API_TOKEN}`).toString('base64');
     
-    const response = await fetch('https://api.name.com/v4/domains:checkAvailability', {
+    // Changed variable name from 'response' to 'apiResponse' to avoid conflict
+    const apiResponse = await fetch('https://api.name.com/v4/domains:checkAvailability', {
       method: 'POST',
       headers: {
         'Authorization': `Basic ${authString}`,
@@ -47,11 +53,11 @@ module.exports = async function handler(req, res) {
       })
     });
 
-    const data = await response.json();
+    const data = await apiResponse.json();
 
-    if (!response.ok) {
+    if (!apiResponse.ok) {
       console.error('API Error:', data);
-      return res.status(response.status).json({ 
+      return res.status(apiResponse.status).json({ 
         error: 'Domain check failed',
         details: data.message || 'Unknown error'
       });
