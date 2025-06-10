@@ -1,10 +1,10 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
-    return res.status(200).end(); // Preflight isteğine cevap ver
+    return res.status(200).end();
   }
 
   if (req.method !== 'POST') {
@@ -12,7 +12,6 @@ export default async function handler(req, res) {
   }
 
   const { domain } = req.body;
-
   if (!domain) {
     return res.status(400).json({ error: 'Lütfen domain gönderin.' });
   }
@@ -28,6 +27,9 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
+
+    console.log('API Response:', data);
+
     return res.status(200).json(data);
   } catch (err) {
     return res.status(500).json({ error: 'API çağrısı başarısız.', details: err.message });
