@@ -1,2 +1,18 @@
-
-const response = await fetch('https://api.name.com/v4/domains:checkAvailability', ...);
+{
+  "name": "domain-checker",
+  "version": "1.0.0",
+  "description": "Domain sorgulama API projesi",
+  "main": "check-domain.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node check-domain.js"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.11"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "author": "",
+  "license": "MIT"
+}
