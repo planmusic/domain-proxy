@@ -1,0 +1,2 @@
+// Hiçbir şey import etmeden:
+const response = await fetch('https://api.name.com/v4/domains:checkAvailability', ...);
