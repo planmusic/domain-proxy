@@ -23,7 +23,7 @@ module.exports = async function handler(req, res) {
         'Authorization': 'Token token=fb23c9d9d9d2291ae95e9185f4e1638a907e51f4',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ domainNames: [domain] })
+      body: JSON.stringify({ domainNames: [planmusic.co] })
     });
 
     const data = await response.json();
