@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   if (!domain) return res.status(400).json({ error: 'Lütfen bir domain belirtin.' });
 
   try {
-    const authString = Buffer.from('planmusic:367bbe8320fc2dfbe8b641427c3dcfc0cf4a69dc').toString('base64');
+    const authString = Buffer.from('yavuzselim-test:6d5946b7a7977a48d262e88d960be46678f62d31').toString('base64');
 
     const response = await fetch('https://api.name.com/v4/domains:checkAvailability', {
       method: 'POST',
