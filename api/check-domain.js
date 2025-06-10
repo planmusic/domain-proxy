@@ -1,46 +1,31 @@
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Sadece POST isteği destekleniyor.' });
+  if (req.method !== 'POST') return res.status(405).json({ error: 'POST gerekli.' });
 
   const { domain } = req.body;
-  if (!domain) return res.status(400).json({ error: 'Lütfen bir domain belirtin.' });
+  if (!domain) return res.status(400).json({ error: 'Domain gerekli.' });
 
   try {
-    const authString = Buffer.from('planmusic:367bbe8320fc2dfbe8b641427c3dcfc0cf4a69dc').toString('base64');
+    const apiKey = '<YOUR_WHOISXML_API_KEY>';
+    const resp = await fetch(`https://domain-availability.whoisxmlapi.com/api/v1?apiKey=${apiKey}&domainName=${domain}`);
+    const data = await resp.json();
 
-    const response = await fetch('https://api.name.com/v4/domains:checkAvailability', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Basic ${authString}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ domainNames: [domain] }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
+    if (!resp.ok) {
       console.error('API Hatası:', data);
-      return res.status(response.status).json({ error: 'Name.com API hatası', details: data });
+      return res.status(resp.status).json({ error: 'API hatası', details: data });
     }
 
-    const result = data.results?.[0];
+    // WhoisXML'in JSON formatına göre domain durumu
+    const available = data?.DomainInfo?.domainAvailability === 'AVAILABLE';
 
-    if (!result) {
-      return res.status(500).json({ error: 'API döndürülen veri eksik.' });
-    }
+    return res.status(200).json({ domain, available });
 
-    return res.status(200).json({
-      domain: result.domainName,
-      available: result.available,
-    });
-
-  } catch (error) {
-    console.error('İç hata:', error);
-    return res.status(500).json({ error: 'Sunucu hatası', details: error.message });
+  } catch (err) {
+    console.error('Sunucu hatası:', err);
+    return res.status(500).json({ error: 'Sunucu hatası', details: err.message });
   }
-}
+};
