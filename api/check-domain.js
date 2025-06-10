@@ -20,7 +20,7 @@ module.exports = async function handler(req, res) {
     const response = await fetch('https://api.name.com/v4/domains:checkAvailability', {
       method: 'POST',
       headers: {
-        'Authorization': 'Token token=367bbe8320fc2dfbe8b641427c3dcfc0cf4a69dc',
+        'Authorization': 'Token token=6d5946b7a7977a48d262e88d960be46678f62d31',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ domainNames: [domain] })
