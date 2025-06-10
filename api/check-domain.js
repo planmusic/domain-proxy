@@ -1,4 +1,4 @@
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -8,12 +8,13 @@ module.exports = async function handler(req, res) {
   }
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Yalnızca POST istekleri destekleniyor.' });
+    return res.status(405).json({ error: 'Sadece POST isteği destekleniyor.' });
   }
 
   const { domain } = req.body;
+
   if (!domain) {
-    return res.status(400).json({ error: 'Lütfen domain gönderin.' });
+    return res.status(400).json({ error: 'Lütfen bir domain belirtin.' });
   }
 
   try {
@@ -21,22 +22,32 @@ module.exports = async function handler(req, res) {
       method: 'POST',
       headers: {
         'Authorization': 'Token token=367bbe8320fc2dfbe8b641427c3dcfc0cf4a69dc',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ domainNames: [domain] })
+      body: JSON.stringify({ domainNames: [domain] }),
     });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      return res.status(response.status).json({ error: 'API hatası', details: errorData });
-    }
 
     const data = await response.json();
 
-    console.log('API Response:', data);
+    if (!response.ok) {
+      console.error('API Hatası:', data);
+      return res.status(response.status).json({ error: 'Name.com API hatası', details: data });
+    }
 
-    return res.status(200).json(data);
-  } catch (err) {
-    return res.status(500).json({ error: 'API çağrısı başarısız.', details: err.message });
+    const result = data.results?.[0];
+
+    if (!result) {
+      return res.status(500).json({ error: 'API döndürülen veri eksik.' });
+    }
+
+    // Embed’in beklediği yapıya uygun veri
+    return res.status(200).json({
+      domain: result.domainName,
+      available: result.available,
+    });
+
+  } catch (error) {
+    console.error('İç hata:', error);
+    return res.status(500).json({ error: 'Sunucu hatası', details: error.message });
   }
 }
