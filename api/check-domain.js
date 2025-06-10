@@ -20,22 +20,21 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Domain is required' });
   }
 
-  // Basic domain format validation
-  const domainRegex = /^(?!:\/\/)([a-zA-Z0-9-]+\.){1,}[a-zA-Z]{2,}$/;
-  if (!domainRegex.test(domain)) {
-    return res.status(400).json({ error: 'Invalid domain format. Example: example.com' });
+  // Get API credentials from environment variables
+  const API_USERNAME = process.env.NAME_API_USERNAME;
+  const API_TOKEN = process.env.NAME_API_TOKEN;
+  
+  if (!API_USERNAME || !API_TOKEN) {
+    console.error('API credentials not configured');
+    return res.status(500).json({ 
+      error: 'Server configuration error',
+      details: 'Domain check service is currently unavailable'
+    });
   }
 
+  // Rest of your code...
   try {
-    // Get API credentials from environment variables
-    const API_USERNAME = process.env.NAME_API_USERNAME;
-    const API_TOKEN = process.env.NAME_API_TOKEN;
-    
-    if (!API_USERNAME || !API_TOKEN) {
-      throw new Error('API credentials not configured');
-    }
-
-    const authString = Buffer.from(`${API_USERNAME}:${API_TOKEN}`).toString('base64');
+    const authString = Buffer.from(`${yavuzselim}:${367bbe8320fc2dfbe8b641427c3dcfc0cf4a69dc}`).toString('base64');
     
     const response = await fetch('https://api.name.com/v4/domains:checkAvailability', {
       method: 'POST',
