@@ -30,6 +30,15 @@ module.exports = async function handler(req, res) {
 
     console.log('API Response:', data);
 
+    {
+  "results": [
+    {
+      "domainName": "example.com",
+      "available": true
+    }
+  ]
+}
+
     if (!response.ok) {
       return res.status(response.status).json({ error: 'API hatası', details: data });
     }
