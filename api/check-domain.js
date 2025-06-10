@@ -10,7 +10,7 @@ module.exports = async (req, res) => {
   if (!domain) return res.status(400).json({ error: 'Domain gerekli.' });
 
   try {
-    const apiKey = '<YOUR_WHOISXML_API_KEY>';
+    const apiKey = 'at_B2U5yeEJ1KaXYPiS7z3kgzzINQJ9R';
     const resp = await fetch(`https://domain-availability.whoisxmlapi.com/api/v1?apiKey=${apiKey}&domainName=${domain}`);
     const data = await resp.json();
 
