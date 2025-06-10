@@ -1,66 +1,42 @@
 module.exports = async function handler(req, res) {
-  // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Only POST allowed' });
-
-  const { domain } = req.body;
-  if (!domain) return res.status(400).json({ error: 'Domain required' });
-
-  // Validate domain format
-  if (!/^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i.test(domain)) {
-    return res.status(400).json({ error: 'Invalid domain format' });
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
   }
 
-  const API_USERNAME = process.env.NAME_API_USERNAME;
-  const API_TOKEN = process.env.NAME_API_TOKEN;
-  
-  if (!API_USERNAME || !API_TOKEN) {
-    return res.status(500).json({ 
-      error: 'Server misconfigured',
-      details: 'API credentials missing' 
-    });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Yalnızca POST istekleri destekleniyor.' });
+  }
+
+  const { domain } = req.body;
+  if (!domain) {
+    return res.status(400).json({ error: 'Lütfen domain gönderin.' });
   }
 
   try {
-    // IMPORTANT: Use this exact auth format
-    const auth = Buffer.from(`${API_USERNAME}:${API_TOKEN}`).toString('base64');
-    
     const response = await fetch('https://api.name.com/v4/domains:checkAvailability', {
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${auth}`,  // Note: Basic auth, not ApiToken
-        'Content-Type': 'application/json',
-        'Accept': 'application/json' 
+        'Authorization': 'Token token=367bbe8320fc2dfbe8b641427c3dcfc0cf4a69dc',
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        domainNames: [domain.toLowerCase()] // API is case-sensitive
-      })
+      body: JSON.stringify({ domainNames: [domain] })
     });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return res.status(response.status).json({ error: 'API hatası', details: errorData });
+    }
 
     const data = await response.json();
 
-    if (!response.ok) {
-      console.error('Name.com API Error:', { 
-        status: response.status,
-        error: data 
-      });
-      return res.status(400).json({ 
-        error: 'Domain check failed',
-        details: data.message || 'API error' 
-      });
-    }
+    console.log('API Response:', data);
 
-    return res.status(200).json(data.results[0] || { available: false });
-
+    return res.status(200).json(data);
   } catch (err) {
-    console.error('Server Error:', err);
-    return res.status(500).json({ 
-      error: 'Internal error',
-      details: err.message 
-    });
+    return res.status(500).json({ error: 'API çağrısı başarısız.', details: err.message });
   }
-};
+}
