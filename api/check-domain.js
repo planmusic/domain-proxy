@@ -34,7 +34,7 @@ module.exports = async function handler(req, res) {
       headers: {
         'Authorization': `Basic ${auth}`,  // Note: Basic auth, not ApiToken
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json' 
       },
       body: JSON.stringify({
         domainNames: [domain.toLowerCase()] // API is case-sensitive
