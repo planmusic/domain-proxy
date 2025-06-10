@@ -9,24 +9,21 @@ module.exports = async function handler(req, res) {
     return res.status(200).end();
   }
 
-  // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Only POST requests are allowed' });
   }
 
-  // Validate request body
   const { domain } = req.body;
   if (!domain) {
     return res.status(400).json({ error: 'Domain is required' });
   }
 
-  // Basic domain format validation
+  // Domain format validation
   const domainRegex = /^(?!:\/\/)([a-zA-Z0-9-]+\.){1,}[a-zA-Z]{2,}$/;
   if (!domainRegex.test(domain)) {
     return res.status(400).json({ error: 'Invalid domain format. Example: example.com' });
   }
 
-  // Get API credentials from environment variables
   const API_USERNAME = process.env.NAME_API_USERNAME;
   const API_TOKEN = process.env.NAME_API_TOKEN;
   
@@ -39,23 +36,22 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const authString = Buffer.from(`${API_USERNAME}:${API_TOKEN}`).toString('base64');
-    
-    // Changed variable name from 'response' to 'apiResponse' to avoid conflict
     const response = await fetch('https://api.name.com/v4/domains:checkAvailability', {
-  method: 'POST',
-  headers: {
-    'Authorization': `ApiToken ${API_USERNAME}:${API_TOKEN}`,  // Changed from Basic to ApiToken
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({ domainNames: [domain] })
-});
+      method: 'POST',
+      headers: {
+        'Authorization': `ApiToken ${API_USERNAME}:${API_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        domainNames: [domain]
+      })
+    });
 
-    const data = await apiResponse.json();
+    const data = await response.json();
 
-    if (!apiResponse.ok) {
+    if (!response.ok) {
       console.error('API Error:', data);
-      return res.status(apiResponse.status).json({ 
+      return res.status(response.status).json({ 
         error: 'Domain check failed',
         details: data.message || 'Unknown error'
       });
