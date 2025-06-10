@@ -42,16 +42,14 @@ module.exports = async function handler(req, res) {
     const authString = Buffer.from(`${API_USERNAME}:${API_TOKEN}`).toString('base64');
     
     // Changed variable name from 'response' to 'apiResponse' to avoid conflict
-    const apiResponse = await fetch('https://api.name.com/v4/domains:checkAvailability', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Basic ${authString}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        domainNames: [domain]
-      })
-    });
+    const response = await fetch('https://api.name.com/v4/domains:checkAvailability', {
+  method: 'POST',
+  headers: {
+    'Authorization': `ApiToken ${API_USERNAME}:${API_TOKEN}`,  // Changed from Basic to ApiToken
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ domainNames: [domain] })
+});
 
     const data = await apiResponse.json();
 
