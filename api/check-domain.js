@@ -34,7 +34,7 @@ module.exports = async function handler(req, res) {
 
   // Rest of your code...
   try {
-    const authString = Buffer.from(`${yavuzselim}:${367bbe8320fc2dfbe8b641427c3dcfc0cf4a69dc}`).toString('base64');
+   const response = await fetch(`https://api.whoapi.com/?domain=${domain}&r=whois&apikey=${process.env.WHOAPI_KEY}`);
     
     const response = await fetch('https://api.name.com/v4/domains:checkAvailability', {
       method: 'POST',
